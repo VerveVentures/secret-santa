@@ -3,6 +3,7 @@ package com.santa
 import cats._
 import cats.effect._
 import cats.implicits._
+import com.santa.sessions.models.Session
 import org.http4s.circe._
 import org.http4s._
 import io.circe.generic.auto._
@@ -14,6 +15,8 @@ import org.http4s.implicits._
 import org.http4s.server._
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.typelevel.ci.CIString
+
+import java.util.UUID
 
 object App extends IOApp {
 
@@ -34,8 +37,8 @@ object App extends IOApp {
     val dsl = Http4sDsl[F]
     import dsl._
     HttpRoutes.of[F] {
-      case GET -> Root / "sessions"  => {
-        Ok("Session endpoint works")
+      case POST -> Root / "sessions"  => {
+        Ok(Session("Verve", UUID.randomUUID().toString).asJson)
       }
     }
   }
