@@ -3,6 +3,7 @@ package com.santa
 import cats._
 import cats.effect._
 import cats.implicits._
+import com.santa.participants.controllers.ParticipantsController
 import com.santa.sessions.models.Session
 import org.http4s.circe._
 import org.http4s._
@@ -43,7 +44,7 @@ object App extends IOApp {
     }
   }
 
-  def allRoutes[F[_] : Monad]: HttpRoutes[F] = {
-    sessionRoutes[F]
+  def allRoutes[F[_] : Concurrent]: HttpRoutes[F] = {
+    sessionRoutes[F] <+> ParticipantsController.participantRoutes[F]
   }
 }
