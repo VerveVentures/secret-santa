@@ -2,6 +2,7 @@ package com.santa
 
 import cats.effect._
 import cats.implicits._
+import com.santa.matches.controllers.MatchesController
 import com.santa.participants.controllers.ParticipantsController
 import com.santa.sessions.controllers.SessionsController
 import org.http4s._
@@ -25,6 +26,6 @@ object App extends IOApp {
   }
 
   def allRoutes[F[_] : Concurrent]: HttpRoutes[F] = {
-    SessionsController.sessionRoutes[F] <+> ParticipantsController.participantRoutes[F]
+    SessionsController.sessionRoutes[F] <+> ParticipantsController.participantRoutes[F] <+> MatchesController.matchRoutes[F]
   }
 }
