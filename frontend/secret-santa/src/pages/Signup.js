@@ -15,6 +15,8 @@ import {
     , Typography
     , Button
 } from '@mui/material';
+import { AlertsService } from '../services/alerts.service';
+const alert = new AlertsService();
 
 const theme = createTheme();
 
@@ -22,7 +24,12 @@ function Signup() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (event) => {
+
+    function displayRejectMsg() {
+        alert.error("Santa is dead. Santa remains dead. And you have killed him");
+    }
+
+    async function handleSubmit(event) {
         /*
         setLoading(true);
         event.preventDefault();
@@ -97,7 +104,7 @@ function Signup() {
                             Do you want to participate?
                         </Typography>
                         <Stack spacing={2} direction="row" sx={{ mt: 1, mb: 5 }}>
-                            <Link to="/reject" style={{ textDecoration: 'none' }}>
+                            <Link to="/reject" style={{ textDecoration: 'none' }} onClick={displayRejectMsg}>
                                 <Button
                                     fullWidth
                                     variant="contained"
