@@ -1,0 +1,14 @@
+body {
+    width: 100%;
+    height: 100%;
+    background-image: url('../public/snow6.gif');
+    background-size:     cover;
+    background-repeat:   no-repeat;
+}
+
+#signup-container{
+    margin-top: 2%;
+    background-color: white;
+    box-shadow: 5px;
+    border-radius: 2%;
+}

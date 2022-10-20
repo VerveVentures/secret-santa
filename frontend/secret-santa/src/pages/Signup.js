@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-
-
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import SendIcon from '@mui/icons-material/Send';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import {
     Avatar
     , TextField
     , Grid
     , Box
     , Container
+    , Stack
+    , Typography
+    , Button
 } from '@mui/material';
 
 const theme = createTheme();
@@ -47,10 +48,10 @@ function Signup() {
 
     return (
         <ThemeProvider theme={theme}>
-            <Container component="main" maxWidth="xs">
+            <Container id="signup-container" component="main" maxWidth="xs">
                 <Box
                     sx={{
-                        marginTop: 8,
+                        marginTop: 0,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
@@ -61,13 +62,13 @@ function Signup() {
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
                                 <TextField
-                                    autoComplete="given-name"
-                                    name="firstName"
+
                                     required
                                     fullWidth
                                     id="firstName"
+                                    name="firstName"
                                     label="First Name"
-                                    autoFocus
+                                    autoComplete="given-name"
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -75,8 +76,8 @@ function Signup() {
                                     required
                                     fullWidth
                                     id="lastName"
-                                    label="Last Name"
                                     name="lastName"
+                                    label="Last Name"
                                     autoComplete="family-name"
                                 />
                             </Grid>
@@ -86,23 +87,36 @@ function Signup() {
                                     multiline
                                     rows={4}
                                     id="comment"
-                                    label="Any comment to share with your secret santa?"
                                     name="comment"
-                                    autoComplete="comment"
+                                    label="Any comment to share with your secret santa?"
                                 />
                             </Grid>
                         </Grid>
-                        <LoadingButton
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                            loading={loading}
-                            loadingPosition="start"
-                            startIcon={<SendIcon />}
-                        >
-                            Participate
-                        </LoadingButton>
+                        <Typography variant="body1" sx={{ mt: 2 }}>
+                            Do you want to participate?
+                        </Typography>
+                        <Stack spacing={2} direction="row" sx={{ mt: 1 , mb: 5}}>
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                startIcon={<ThumbDownIcon />}
+                                color="error"
+                            >
+                                NO
+                            </Button>
+                            <LoadingButton
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                loading={loading}
+                                loadingPosition="start"
+                                startIcon={<ThumbUpIcon />}
+                                color="success"
+                            >
+                                YES
+                            </LoadingButton>
+
+                        </Stack>
                     </Box>
                 </Box>
             </Container>
