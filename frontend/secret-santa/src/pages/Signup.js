@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import LoadingButton from '@mui/lab/LoadingButton';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
@@ -95,15 +96,17 @@ function Signup() {
                         <Typography variant="body1" sx={{ mt: 2 }}>
                             Do you want to participate?
                         </Typography>
-                        <Stack spacing={2} direction="row" sx={{ mt: 1 , mb: 5}}>
-                            <Button
-                                fullWidth
-                                variant="contained"
-                                startIcon={<ThumbDownIcon />}
-                                color="error"
-                            >
-                                NO
-                            </Button>
+                        <Stack spacing={2} direction="row" sx={{ mt: 1, mb: 5 }}>
+                            <Link to="/reject" style={{ textDecoration: 'none' }}>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    startIcon={<ThumbDownIcon />}
+                                    color="error"
+                                >
+                                    NO
+                                </Button>
+                            </Link>
                             <LoadingButton
                                 type="submit"
                                 fullWidth
