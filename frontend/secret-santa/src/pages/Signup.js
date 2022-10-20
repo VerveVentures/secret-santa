@@ -1,46 +1,53 @@
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+
+//mui
 import LoadingButton from '@mui/lab/LoadingButton';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import {
-    Avatar
-    , TextField
-    , Grid
-    , Box
-    , Container
-    , Stack
-    , Typography
-    , Button
-} from '@mui/material';
-import { AlertsService } from '../services/alerts.service';
-const alert = new AlertsService();
+import { Avatar, TextField, Grid, Box, Container, Stack, Typography, Button } from '@mui/material';
 
-const theme = createTheme();
+//services
+import { alertsService } from '../services/alerts.service';
+
+//instantiate services
+const alert = new alertsService();
+const theme = new createTheme();
 
 function Signup() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
 
+
+    function handleFirstNameChange(e) {
+        setFirstName(e.target.value)
+    }
+
+    function handleLastNameChange(e) {
+        setLastName(e.target.value)
+    }
 
     function displayRejectMsg() {
-        alert.error("Santa is dead. Santa remains dead. And you have killed him");
+        alert.showError("Santa is dead. Santa remains dead. And you have killed him");
     }
 
     async function handleSubmit(event) {
-        /*
         setLoading(true);
         event.preventDefault();
         const data = new FormData(event.currentTarget);
 
-        var profileData = {
+        var decision = {
             firstName: data.get('firstName'),
             lastName: data.get('lastName'),
-            email: data.get('email'),
+            comment: data.get('comment'),
         }
 
+        console.log(decision);
+        /*
         try {
             await web3Service.deploy(profileData);
             navigate('/');
@@ -50,8 +57,6 @@ function Signup() {
             setLoading(false);
         }
         */
-        console.log('submit')
-
     };
 
     return (
@@ -70,13 +75,13 @@ function Signup() {
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
                                 <TextField
-
                                     required
                                     fullWidth
                                     id="firstName"
                                     name="firstName"
                                     label="First Name"
                                     autoComplete="given-name"
+                                    value={firstName} onChange={handleFirstNameChange}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -87,6 +92,7 @@ function Signup() {
                                     name="lastName"
                                     label="Last Name"
                                     autoComplete="family-name"
+                                    value={lastName} onChange={handleLastNameChange}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -122,6 +128,7 @@ function Signup() {
                                 loadingPosition="start"
                                 startIcon={<ThumbUpIcon />}
                                 color="success"
+                                disabled={!firstName || !lastName}
                             >
                                 YES
                             </LoadingButton>

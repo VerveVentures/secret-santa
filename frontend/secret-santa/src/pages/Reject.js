@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import './style.css'
+import './css/style.css'
 
 function Reject() {
     return (
