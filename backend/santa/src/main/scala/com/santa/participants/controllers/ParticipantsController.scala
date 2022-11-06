@@ -2,8 +2,8 @@ package com.santa.participants.controllers
 
 import cats.effect._
 import cats.implicits._
-import com.santa.participants.models.CreateParticipantInput
-import com.santa.participants.repositories.{InMemoryParticipantRepository, ParticipantsRepository}
+import com.santa.participants.models.{CreateParticipantInput, UpdateParticipantInput}
+import com.santa.participants.repositories.ParticipantsRepository
 import com.santa.participants.services.{ParticipantsService, ParticipantsServiceImpl}
 import io.circe.generic.auto._
 import io.circe.syntax._
@@ -11,27 +11,45 @@ import org.http4s._
 import org.http4s.circe._
 import org.http4s.dsl._
 
-object ParticipantsController {
+class ParticipantsController(participantsService: ParticipantsService) {
 
-  val participantsRepository: ParticipantsRepository = new InMemoryParticipantRepository()
-  val participantsService: ParticipantsService = new ParticipantsServiceImpl(participantsRepository)
-
-  def participantRoutes[F[_] : Concurrent]: HttpRoutes[F] = {
-    val dsl = Http4sDsl[F]
+  def participantRoutes: HttpRoutes[IO] = {
+    val dsl = Http4sDsl[IO]
     import dsl._
 
-    HttpRoutes.of[F] {
-      case GET -> Root / "participants" => {
-        Ok()
+    HttpRoutes.of[IO] {
+      case GET -> Root / "participants" / UUIDVar(sessionId) => {
+        for {
+          result <- participantsService.getParticipants(sessionId.toString)
+          result <- Ok(result.asJson)
+        } yield {
+          result
+        }
+      }
+      case GET -> Root / "participant" / UUIDVar(participantId) => {
+        for {
+          result <- participantsService.getParticipant(participantId.toString)
+          result <- Ok(result.asJson)
+        } yield {
+          result
+        }
       }
       case req@POST -> Root / "participants" =>
-        implicit val participantDecoder: EntityDecoder[F, CreateParticipantInput] = jsonOf[F, CreateParticipantInput]
+        implicit val participantDecoder: EntityDecoder[IO, CreateParticipantInput] = jsonOf[IO, CreateParticipantInput]
         for {
           participantInput <- req.as[CreateParticipantInput]
-          participant = participantsService.create(participantInput)
+          participant <- participantsService.create(participantInput)
           res <- Ok(participant.asJson)
         } yield {
-          println("Created it", participant)
+          res
+        }
+      case req@PUT -> Root / "participants" / UUIDVar(participantId) =>
+        implicit val participantDecoder: EntityDecoder[IO, UpdateParticipantInput] = jsonOf[IO, UpdateParticipantInput]
+        for {
+          participantInput <- req.as[UpdateParticipantInput]
+          participant <- participantsService.updateParticipant(participantId.toString, participantInput)
+          res <- Ok(participant.asJson)
+        } yield {
           res
         }
     }

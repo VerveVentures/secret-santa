@@ -22,7 +22,7 @@ class PostgresMatchesRepository(transactor: Transactor[IO]) extends MatchesRepos
 
   override def get(id: String): IO[Either[MatchNotFoundError.type, Match]] = {
     sql"SELECT id, session_id, giver, receiver FROM matches WHERE id = $id".query[Match].option.transact(transactor).map {
-      case Some(todo) => Right(todo)
+      case Some(matching) => Right(matching)
       case None => Left(MatchNotFoundError)
     }
   }

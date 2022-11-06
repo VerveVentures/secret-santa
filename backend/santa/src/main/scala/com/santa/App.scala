@@ -9,6 +9,8 @@ import com.santa.sessions.controllers.SessionsController
 import com.santa.config.config.Config
 import com.santa.matches.repositories.PostgresMatchesRepository
 import com.santa.matches.services.MatchesServiceImpl
+import com.santa.participants.repositories.PostgresParticipantsRepository
+import com.santa.participants.services.ParticipantsServiceImpl
 import doobie.hikari.HikariTransactor
 import doobie.util.ExecutionContexts
 import org.http4s._
@@ -22,8 +24,8 @@ object App extends IOApp {
     create()
   }
 
-  def allRoutes(matchesController: MatchesController): HttpRoutes[IO] = {
-    SessionsController.sessionRoutes[IO] <+> ParticipantsController.participantRoutes[IO] <+> matchesController.matchRoutes
+  def allRoutes(participantsController: ParticipantsController, matchesController: MatchesController): HttpRoutes[IO] = {
+    SessionsController.sessionRoutes[IO] <+> participantsController.participantRoutes <+> matchesController.matchRoutes
   }
 
   def create(configFile: String = "application.conf"): IO[ExitCode] = {
@@ -45,8 +47,11 @@ object App extends IOApp {
       matchesRepository = new PostgresMatchesRepository(resources.transactor)
       matchesService = new MatchesServiceImpl(matchesRepository)
       matchesController = new MatchesController(matchesService)
+      participantsRepository = new PostgresParticipantsRepository(resources.transactor)
+      participantsService = new ParticipantsServiceImpl(participantsRepository)
+      participantsController = new ParticipantsController(participantsService)
       apis = Router(
-        "/api" -> allRoutes(matchesController),
+        "/api" -> allRoutes(participantsController, matchesController),
       ).orNotFound
       exitCode <- BlazeServerBuilder[IO](runtime.compute)
         .bindHttp(8080, "localhost")
