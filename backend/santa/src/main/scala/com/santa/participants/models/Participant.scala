@@ -1,7 +1,10 @@
 package com.santa.participants.models
 
 case class Participant(
-  name: String,
-  sessionId: String,
-  id: String
+    id: String,
+    sessionId: String,
+    name: String,
+    email: String,
+    participates: Boolean,
+    comment: String
 )

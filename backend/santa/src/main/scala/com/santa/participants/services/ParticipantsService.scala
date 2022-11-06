@@ -27,7 +27,10 @@ class ParticipantsServiceImpl(
     participantRepository.create(Participant(
       id = UUID.randomUUID().toString,
       name = input.name,
-      sessionId = input.sessionId
+      sessionId = input.sessionId,
+      comment = input.comment,
+      email = input.email,
+      participates = input.participates
     ))
   }
 

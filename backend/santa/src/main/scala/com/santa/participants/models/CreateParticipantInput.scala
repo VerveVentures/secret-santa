@@ -1,6 +1,9 @@
 package com.santa.participants.models
 
 case class CreateParticipantInput(
-  name: String,
-  sessionId: String
+   sessionId: String,
+   name: String,
+   email: String,
+   participates: Boolean,
+   comment: String
 )

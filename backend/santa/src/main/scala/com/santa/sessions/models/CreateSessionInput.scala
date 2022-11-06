@@ -1,5 +1,6 @@
 package com.santa.sessions.models
 
 case class CreateSessionInput(
-  name: String
+  name: String,
+  passphrase: String
 )

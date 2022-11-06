@@ -26,6 +26,8 @@ class SessionsServiceImpl(
     SessionRepository.create(Session(
       id = UUID.randomUUID().toString,
       name = input.name,
+      passphrase = input.passphrase,
+      sessionScrambled = false, emailsSent = false
     ))
   }
 
