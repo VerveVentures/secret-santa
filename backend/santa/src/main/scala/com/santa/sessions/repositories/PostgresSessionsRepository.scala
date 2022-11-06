@@ -11,19 +11,19 @@ class PostgresSessionsRepository(transactor: Transactor[IO]) extends SessionsRep
   private val simpleLogHandler = LogHandler.jdkLogHandler
 
   override def create(input: Session): IO[Session] = {
-    sql"INSERT INTO sessions (id, name, passphrase, session_scrambled, emailsSent) VALUES (${input.id}, ${input.name}, ${input.passphrase}, ${input.sessionScrambled}, ${input.emailsSent})"
+    sql"INSERT INTO sessions (id, name, passphrase, session_scrambled, emails_sent) VALUES (${input.id}, ${input.name}, ${input.passphrase}, ${input.sessionScrambled}, ${input.emailsSent})"
       .updateWithLogHandler(simpleLogHandler).run.transact(transactor).map(_ => {
       input
     })
   }
 
   override def getSessions: IO[List[Session]] = {
-    sql"SELECT id, name, passphrase, session_scrambled, emailsSent FROM sessions".query[Session].stream.compile.toList.transact(transactor)
+    sql"SELECT id, name, passphrase, session_scrambled, emails_sent FROM sessions".query[Session].stream.compile.toList.transact(transactor)
   }
 
 
   override def get(id: String): IO[Either[SessionNotFoundError.type, Session]] = {
-    sql"SELECT id, session_id, name, email, participates, comment FROM sessions WHERE id = $id".query[Session].option.transact(transactor).map {
+    sql"SELECT id, name, passphrase, session_scrambled, emails_sent FROM sessions WHERE id = $id".query[Session].option.transact(transactor).map {
       case Some(session) => Right(session)
       case None => Left(SessionNotFoundError)
     }
@@ -41,7 +41,7 @@ class PostgresSessionsRepository(transactor: Transactor[IO]) extends SessionsRep
 
 
   override def updateSession(id: String, session: Session): IO[Either[SessionNotFoundError.type, Session]] = {
-    sql"UPDATE session SET name = ${session.name}, passphrase = ${session.passphrase}, session_scrambled = ${session.sessionScrambled}, emailsSent = ${session.emailsSent} WHERE id = $id".update.run.transact(transactor).map { affectedRows =>
+    sql"UPDATE session SET name = ${session.name}, passphrase = ${session.passphrase}, session_scrambled = ${session.sessionScrambled}, emails_sent = ${session.emailsSent} WHERE id = $id".update.run.transact(transactor).map { affectedRows =>
       if (affectedRows == 1) {
         Right(session)
       } else {
