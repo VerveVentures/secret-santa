@@ -43,7 +43,7 @@ function Signup() {
         var decision = {
             firstName: data.get('firstName'),
             lastName: data.get('lastName'),
-            comment: data.get('comment'),
+            comment: data.get('comment')
         }
 
         console.log(decision);
