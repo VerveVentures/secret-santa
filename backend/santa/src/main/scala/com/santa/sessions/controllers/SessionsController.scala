@@ -2,8 +2,8 @@ package com.santa.sessions.controllers
 
 import cats.effect._
 import cats.implicits._
-import com.santa.sessions.models.CreateSessionInput
-import com.santa.sessions.repositories.{InMemorySessionsRepository, SessionsRepository}
+import com.santa.sessions.models.{CreateSessionInput, UpdateSessionInput}
+import com.santa.sessions.repositories.SessionsRepository
 import com.santa.sessions.services.{SessionsService, SessionsServiceImpl}
 import io.circe.generic.auto._
 import io.circe.syntax._
@@ -11,29 +11,38 @@ import org.http4s._
 import org.http4s.circe._
 import org.http4s.dsl._
 
-object SessionsController {
-
-  val sessionsRepository: SessionsRepository = new InMemorySessionsRepository()
-  val sessionsService: SessionsService = new SessionsServiceImpl(sessionsRepository)
+class SessionsController(sessionsService: SessionsService) {
 
 
-
-  def sessionRoutes[F[_] : Concurrent]: HttpRoutes[F] = {
-    val dsl = Http4sDsl[F]
+  def sessionRoutes: HttpRoutes[IO] = {
+    val dsl = Http4sDsl[IO]
     import dsl._
 
-    HttpRoutes.of[F] {
-      case GET -> Root / "sessions" => {
-        Ok(sessionsService.getSessions.asJson)
+    HttpRoutes.of[IO] {
+      case GET -> Root / "sessions" / UUIDVar(sessionId) => {
+        for {
+          result <- sessionsService.get(sessionId.toString)
+          result <- Ok(result.asJson)
+        } yield {
+          result
+        }
       }
       case req@POST -> Root / "sessions" =>
-        implicit val sessionsDecoder: EntityDecoder[F, CreateSessionInput] = jsonOf[F, CreateSessionInput]
+        implicit val participantDecoder: EntityDecoder[IO, CreateSessionInput] = jsonOf[IO, CreateSessionInput]
         for {
-          createSessionInput <- req.as[CreateSessionInput]
-          participant = sessionsService.create(createSessionInput)
+          participantInput <- req.as[CreateSessionInput]
+          participant <- sessionsService.create(participantInput)
           res <- Ok(participant.asJson)
         } yield {
-          println("Created it", participant)
+          res
+        }
+      case req@PUT -> Root / "sessions" / UUIDVar(sessionId) =>
+        implicit val participantDecoder: EntityDecoder[IO, UpdateSessionInput] = jsonOf[IO, UpdateSessionInput]
+        for {
+          participantInput <- req.as[UpdateSessionInput]
+          participant <- sessionsService.updateSession(session.toString, participantInput)
+          res <- Ok(participant.asJson)
+        } yield {
           res
         }
     }

@@ -1,29 +1,30 @@
 package com.santa.sessions.services
 
-import com.santa.sessions.models.{CreateSessionInput, Session, UpdateSessionInput}
+import cats.effect.IO
+import com.santa.sessions.models.{CreateSessionInput, Session, SessionNotFoundError, UpdateSessionInput}
 import com.santa.sessions.repositories.SessionsRepository
 
 import java.util.UUID
 
 trait SessionsService {
 
-  def create(input: CreateSessionInput): Session
+  def create(input: CreateSessionInput): IO[Session]
 
-  def getSessions: List[Session]
+  def getSessions: IO[List[Session]]
 
-  def get(sessionId: String): Session
+  def get(sessionId: String): IO[Either[SessionNotFoundError.type, Session]]
 
-  def deleteSession(id: String): Boolean
+  def deleteSession(id: String): IO[Either[SessionNotFoundError.type, Boolean]]
 
-  def updateSession(id: String, updateInput: UpdateSessionInput): Session
+  def updateSession(id: String, updateInput: UpdateSessionInput): IO[Either[SessionNotFoundError.type, Session]]
 }
 
 class SessionsServiceImpl(
-  SessionRepository: SessionsRepository
+  sessionRepository: SessionsRepository
 ) extends SessionsService {
 
-  override def create(input: CreateSessionInput): Session = {
-    SessionRepository.create(Session(
+  override def create(input: CreateSessionInput): IO[Session] = {
+    sessionRepository.create(Session(
       id = UUID.randomUUID().toString,
       name = input.name,
       passphrase = input.passphrase,
@@ -32,19 +33,25 @@ class SessionsServiceImpl(
   }
 
   override def getSessions: List[Session] = {
-    SessionRepository.getSessions
+    sessionRepository.getSessions
   }
 
-  override def get(id: String): Session = {
-    SessionRepository.get(id)
+  override def get(id: String): IO[Either[SessionNotFoundError.type, Session]] = {
+    sessionRepository.get(id)
   }
 
-  override def deleteSession(id: String): Boolean = {
-    SessionRepository.deleteSession(id)
+  override def deleteSession(id: String): IO[Either[SessionNotFoundError.type, Boolean]] = {
+    sessionRepository.deleteSession(id)
   }
 
-  override def updateSession(id: String, updateInput: UpdateSessionInput): Session = {
-    val Session = SessionRepository.get(id)
-    SessionRepository.updateSession(id, Session.copy(name = updateInput.name))
+  override def updateSession(id: String, updateInput: UpdateSessionInput): IO[Either[SessionNotFoundError.type, Session]] = {
+    sessionRepository.get(id).flatMap({
+      case Right(a) => sessionRepository.updateSession(id, a.copy(
+        name = updateInput.name,
+        sessionScrambled = updateInput.sessionScrambled,
+        emailsSent = updateInput.emailsSent
+      ))
+      case Left(_) => IO(Left(SessionNotFoundError))
+    })
   }
 }

@@ -20,7 +20,7 @@ class PostgresParticipantsRepository(transactor: Transactor[IO]) extends Partici
     sql"SELECT id, session_id, name, email, participates, comment FROM participants".query[Participant].stream.compile.toList.transact(transactor)
   }
 
-  override def getParticipant(id: String): IO[Either[ParticipantNotFoundError.type, Participant]]= {
+  override def getParticipant(id: String): IO[Either[ParticipantNotFoundError.type, Participant]] = {
     sql"SELECT id, session_id, name, email, participates, comment FROM participants WHERE id = $id".query[Participant].option.transact(transactor).map {
       case Some(participant) => Right(participant)
       case None => Left(ParticipantNotFoundError)
