@@ -11,6 +11,7 @@ val Http4sVersion = "1.0.0-M21"
 val CirceVersion = "0.14.0-M5"
 lazy val DoobieVersion = "1.0.0-RC2"
 lazy val PureConfigVersion = "0.17.1"
+lazy val LogbackVersion = "1.2.11"
 
 libraryDependencies ++= Seq(
   "org.http4s"      %% "http4s-blaze-server" % Http4sVersion,
@@ -22,5 +23,6 @@ libraryDependencies ++= Seq(
   "org.tpolecat" %% "doobie-hikari" % DoobieVersion,
   "com.github.pureconfig" %% "pureconfig" % PureConfigVersion,
   "com.github.pureconfig" %% "pureconfig-cats-effect" % PureConfigVersion,
-  "com.typesafe" % "config" % "1.2.0"
+  "com.typesafe" % "config" % "1.2.0",
+  "ch.qos.logback"        %  "logback-classic"      % LogbackVersion,
 )

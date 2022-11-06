@@ -1,17 +1,18 @@
 package com.santa.matches.repositories
 
-import com.santa.matches.models.Match
+import cats.effect.IO
+import com.santa.matches.models.{Match, MatchNotFoundError}
 
 
 trait MatchesRepository {
 
-  def create(input: Match): Match
+  def create(input: Match): IO[Match]
 
-  def getMatches(sessionId: String): List[Match]
+  def getMatches(sessionId: String): IO[List[Match]]
 
-  def get(id: String): Match
+  def get(id: String): IO[Either[MatchNotFoundError.type, Match]]
 
-  def deleteMatch(id: String): Boolean
+  def deleteMatch(id: String): IO[Either[MatchNotFoundError.type, Boolean]]
 }
 
 

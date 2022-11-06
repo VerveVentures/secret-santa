@@ -7,6 +7,8 @@ import com.santa.matches.controllers.MatchesController
 import com.santa.participants.controllers.ParticipantsController
 import com.santa.sessions.controllers.SessionsController
 import com.santa.config.config.Config
+import com.santa.matches.repositories.PostgresMatchesRepository
+import com.santa.matches.services.MatchesServiceImpl
 import doobie.hikari.HikariTransactor
 import doobie.util.ExecutionContexts
 import org.http4s._
@@ -20,8 +22,8 @@ object App extends IOApp {
     create()
   }
 
-  def allRoutes[F[_] : Concurrent]: HttpRoutes[F] = {
-    SessionsController.sessionRoutes[F] <+> ParticipantsController.participantRoutes[F] <+> MatchesController.matchRoutes[F]
+  def allRoutes(matchesController: MatchesController): HttpRoutes[IO] = {
+    SessionsController.sessionRoutes[IO] <+> ParticipantsController.participantRoutes[IO] <+> matchesController.matchRoutes
   }
 
   def create(configFile: String = "application.conf"): IO[ExitCode] = {
@@ -37,11 +39,15 @@ object App extends IOApp {
   }
 
   private def create(resources: Resources): IO[ExitCode] = {
-    val apis = Router(
-      "/api" -> allRoutes[IO],
-    ).orNotFound
+
     for {
       _ <- Database.initialize(resources.transactor)
+      matchesRepository = new PostgresMatchesRepository(resources.transactor)
+      matchesService = new MatchesServiceImpl(matchesRepository)
+      matchesController = new MatchesController(matchesService)
+      apis = Router(
+        "/api" -> allRoutes(matchesController),
+      ).orNotFound
       exitCode <- BlazeServerBuilder[IO](runtime.compute)
         .bindHttp(8080, "localhost")
         .withHttpApp(apis)

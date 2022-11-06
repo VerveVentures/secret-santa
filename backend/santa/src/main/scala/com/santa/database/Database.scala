@@ -20,6 +20,7 @@ object Database {
   def initialize(transactor: HikariTransactor[IO]): IO[Unit] = {
     transactor.configure { dataSource =>
       IO {
+        println("successfully connected to db")
         ()
       }
     }

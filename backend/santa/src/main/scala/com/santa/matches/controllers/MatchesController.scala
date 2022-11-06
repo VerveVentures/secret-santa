@@ -3,7 +3,7 @@ package com.santa.matches.controllers
 import cats.effect._
 import cats.implicits._
 import com.santa.matches.models.CreateMatchInput
-import com.santa.matches.repositories.{InMemoryMatchesRepository, MatchesRepository}
+import com.santa.matches.repositories.{MatchesRepository, PostgresMatchesRepository}
 import com.santa.matches.services.{MatchesService, MatchesServiceImpl}
 import io.circe.generic.auto._
 import io.circe.syntax._
@@ -11,28 +11,34 @@ import org.http4s._
 import org.http4s.circe._
 import org.http4s.dsl._
 
-object MatchesController {
+class MatchesController(matchesService: MatchesService) {
 
-  val matchesRepository: MatchesRepository = new InMemoryMatchesRepository()
-  val matchesService: MatchesService = new MatchesServiceImpl(matchesRepository)
-
-
-  def matchRoutes[F[_] : Concurrent]: HttpRoutes[F] = {
-    val dsl = Http4sDsl[F]
+  def matchRoutes: HttpRoutes[IO] = {
+    val dsl = Http4sDsl[IO]
     import dsl._
 
-    HttpRoutes.of[F] {
+    HttpRoutes.of[IO] {
       case GET -> Root / "matches" / UUIDVar(sessionId)=> {
-        Ok(matchesService.getMatches(sessionId.toString).asJson)
+        for {
+          result <- matchesService.getMatches(sessionId.toString)
+          result <- Ok(result.asJson)
+        } yield {
+          result
+        }
       }
       case GET -> Root / "match" / UUIDVar(matchId) => {
-        Ok(matchesService.get(matchId.toString).asJson)
+        for {
+          result <- matchesService.get(matchId.toString)
+          result <- Ok(result.asJson)
+        } yield {
+          result
+        }
       }
       case req@POST -> Root / "matches" =>
-        implicit val sessionsDecoder: EntityDecoder[F, CreateMatchInput] = jsonOf[F, CreateMatchInput]
+        implicit val sessionsDecoder: EntityDecoder[IO, CreateMatchInput] = jsonOf[IO, CreateMatchInput]
         for {
           createMatchInput <- req.as[CreateMatchInput]
-          matching = matchesService.create(createMatchInput)
+          matching <- matchesService.create(createMatchInput)
           res <- Ok(matching.asJson)
         } yield {
           res
