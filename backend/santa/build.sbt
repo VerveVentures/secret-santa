@@ -26,3 +26,5 @@ libraryDependencies ++= Seq(
   "com.typesafe" % "config" % "1.2.0",
   "ch.qos.logback"        %  "logback-classic"      % LogbackVersion,
 )
+
+enablePlugins(JavaAppPackaging)

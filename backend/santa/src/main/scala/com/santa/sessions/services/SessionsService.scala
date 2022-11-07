@@ -32,7 +32,7 @@ class SessionsServiceImpl(
     ))
   }
 
-  override def getSessions: List[Session] = {
+  override def getSessions: IO[List[Session]] = {
     sessionRepository.getSessions
   }
 

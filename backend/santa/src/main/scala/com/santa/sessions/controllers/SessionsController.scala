@@ -30,18 +30,18 @@ class SessionsController(sessionsService: SessionsService) {
       case req@POST -> Root / "sessions" =>
         implicit val participantDecoder: EntityDecoder[IO, CreateSessionInput] = jsonOf[IO, CreateSessionInput]
         for {
-          participantInput <- req.as[CreateSessionInput]
-          participant <- sessionsService.create(participantInput)
-          res <- Ok(participant.asJson)
+          sessionInput <- req.as[CreateSessionInput]
+          session <- sessionsService.create(sessionInput)
+          res <- Ok(session.asJson)
         } yield {
           res
         }
       case req@PUT -> Root / "sessions" / UUIDVar(sessionId) =>
         implicit val participantDecoder: EntityDecoder[IO, UpdateSessionInput] = jsonOf[IO, UpdateSessionInput]
         for {
-          participantInput <- req.as[UpdateSessionInput]
-          participant <- sessionsService.updateSession(session.toString, participantInput)
-          res <- Ok(participant.asJson)
+          sessionInput <- req.as[UpdateSessionInput]
+          session <- sessionsService.updateSession(sessionId.toString, sessionInput)
+          res <- Ok(session.asJson)
         } yield {
           res
         }
