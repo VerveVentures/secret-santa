@@ -59,7 +59,7 @@ object App extends IOApp {
         "/api" -> allRoutes(sessionsController, participantsController, matchesController),
       ).orNotFound
       exitCode <- BlazeServerBuilder[IO](runtime.compute)
-        .bindHttp(8080, "localhost")
+        .bindHttp(resources.config.server.port, resources.config.server.host)
         .withHttpApp(apis)
         .resource
         .use(_ => IO.never)

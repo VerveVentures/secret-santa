@@ -8,6 +8,7 @@ import scala.concurrent.ExecutionContext
 
 object Database {
   def transactor(config: DatabaseConfig, executionContext: ExecutionContext): Resource[IO, HikariTransactor[IO]] = {
+    println("config is", config)
     HikariTransactor.newHikariTransactor[IO](
       config.driver,
       config.url,

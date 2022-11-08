@@ -1,10 +1,8 @@
 package com.santa.sessions.controllers
 
 import cats.effect._
-import cats.implicits._
 import com.santa.sessions.models.{CreateSessionInput, UpdateSessionInput}
-import com.santa.sessions.repositories.SessionsRepository
-import com.santa.sessions.services.{SessionsService, SessionsServiceImpl}
+import com.santa.sessions.services.SessionsService
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s._

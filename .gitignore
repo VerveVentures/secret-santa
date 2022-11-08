@@ -13,7 +13,6 @@ project/project/
 project/target/
 target/
 
-
 # intellij idea
 *.log
 *.iml

@@ -1,10 +1,8 @@
 package com.santa.matches.controllers
 
 import cats.effect._
-import cats.implicits._
 import com.santa.matches.models.CreateMatchInput
-import com.santa.matches.repositories.{MatchesRepository, PostgresMatchesRepository}
-import com.santa.matches.services.{MatchesService, MatchesServiceImpl}
+import com.santa.matches.services.MatchesService
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s._
