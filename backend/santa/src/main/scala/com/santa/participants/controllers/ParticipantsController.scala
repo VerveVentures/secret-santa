@@ -1,10 +1,8 @@
 package com.santa.participants.controllers
 
 import cats.effect._
-import cats.implicits._
 import com.santa.participants.models.{CreateParticipantInput, UpdateParticipantInput}
-import com.santa.participants.repositories.ParticipantsRepository
-import com.santa.participants.services.{ParticipantsService, ParticipantsServiceImpl}
+import com.santa.participants.services.ParticipantsService
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s._

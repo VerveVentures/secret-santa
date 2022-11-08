@@ -50,10 +50,10 @@ class ParticipantsServiceImpl(
   override def updateParticipant(id: String, updateInput: UpdateParticipantInput): IO[Either[ParticipantNotFoundError.type, Participant]] = {
     participantRepository.getParticipant(id).flatMap( {
         case Right(a) => participantRepository.updateParticipant(id, a.copy(
-          name = updateInput.name,
-          email = updateInput.email,
-          participates = updateInput.participates,
-          comment = updateInput.comment
+          name = updateInput.name.getOrElse(a.name),
+          email = updateInput.email.getOrElse(a.email),
+          participates = updateInput.participates.orElse(a.participates),
+          comment = updateInput.comment.orElse(a.comment)
         ))
         case Left(_) => IO(Left(ParticipantNotFoundError))
       }

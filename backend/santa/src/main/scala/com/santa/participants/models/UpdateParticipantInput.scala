@@ -1,8 +1,8 @@
 package com.santa.participants.models
 
 case class UpdateParticipantInput(
-     name: String,
-     email: String,
-     participates: Boolean,
-     comment: String
+     name: Option[String],
+     email: Option[String],
+     participates: Option[Boolean],
+     comment: Option[String]
 )

@@ -47,9 +47,9 @@ class SessionsServiceImpl(
   override def updateSession(id: String, updateInput: UpdateSessionInput): IO[Either[SessionNotFoundError.type, Session]] = {
     sessionRepository.get(id).flatMap({
       case Right(a) => sessionRepository.updateSession(id, a.copy(
-        name = updateInput.name,
-        sessionScrambled = updateInput.sessionScrambled,
-        emailsSent = updateInput.emailsSent
+        name = updateInput.name.getOrElse(a.name),
+        sessionScrambled = updateInput.sessionScrambled.getOrElse(a.sessionScrambled),
+        emailsSent = updateInput.emailsSent.getOrElse(a.emailsSent)
       ))
       case Left(_) => IO(Left(SessionNotFoundError))
     })

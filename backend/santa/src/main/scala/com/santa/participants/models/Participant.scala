@@ -5,6 +5,6 @@ case class Participant(
     sessionId: String,
     name: String,
     email: String,
-    participates: Boolean,
-    comment: String
+    participates: Option[Boolean],
+    comment: Option[String]
 )

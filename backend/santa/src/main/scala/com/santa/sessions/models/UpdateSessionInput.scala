@@ -1,7 +1,7 @@
 package com.santa.sessions.models
 
 case class UpdateSessionInput(
-  name: String,
-  sessionScrambled: Boolean,
-  emailsSent: Boolean
+  name: Option[String],
+  sessionScrambled: Option[Boolean],
+  emailsSent: Option[Boolean]
 )
