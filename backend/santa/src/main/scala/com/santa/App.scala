@@ -53,7 +53,7 @@ object App extends IOApp {
       participantsService = new ParticipantsServiceImpl(participantsRepository)
       participantsController = new ParticipantsController(participantsService)
       sessionsRepository = new PostgresSessionsRepository(resources.transactor)
-      sessionsService = new SessionsServiceImpl(sessionsRepository)
+      sessionsService = new SessionsServiceImpl(sessionsRepository,participantsService, matchesService)
       sessionsController = new SessionsController(sessionsService)
       apis = Router(
         "/api" -> allRoutes(sessionsController, participantsController, matchesController),

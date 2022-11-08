@@ -11,7 +11,6 @@ import org.http4s.dsl._
 
 class SessionsController(sessionsService: SessionsService) {
 
-
   def sessionRoutes: HttpRoutes[IO] = {
     val dsl = Http4sDsl[IO]
     import dsl._
@@ -20,6 +19,14 @@ class SessionsController(sessionsService: SessionsService) {
       case GET -> Root / "sessions" / UUIDVar(sessionId) => {
         for {
           result <- sessionsService.get(sessionId.toString)
+          result <- Ok(result.asJson)
+        } yield {
+          result
+        }
+      }
+      case POST -> Root / "sessions" / UUIDVar(sessionId) / "scramble" => {
+        for {
+          result <- sessionsService.scramble(sessionId.toString)
           result <- Ok(result.asJson)
         } yield {
           result

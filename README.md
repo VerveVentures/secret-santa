@@ -21,7 +21,7 @@ body: - all fields are optional
     emailsSent: Boolean
   }
 ```
-- GET: /api/sessions/<session_id>/scramble - scramble a session (generates the matches between participants) - not implemented yet 
+- POST: /api/sessions/<session_id>/scramble - scramble a session (generates the matches between participants) 
 
 
 ### Participants

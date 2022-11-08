@@ -1,10 +1,15 @@
 package com.santa.sessions.services
 
 import cats.effect.IO
+import com.santa.matches.models.{CreateMatchInput, Match}
+import com.santa.matches.services.MatchesService
+import com.santa.participants.services.ParticipantsService
 import com.santa.sessions.models.{CreateSessionInput, Session, SessionNotFoundError, UpdateSessionInput}
 import com.santa.sessions.repositories.SessionsRepository
+import cats.implicits._
 
 import java.util.UUID
+import scala.util.Random
 
 trait SessionsService {
 
@@ -17,10 +22,14 @@ trait SessionsService {
   def deleteSession(id: String): IO[Either[SessionNotFoundError.type, Boolean]]
 
   def updateSession(id: String, updateInput: UpdateSessionInput): IO[Either[SessionNotFoundError.type, Session]]
+
+  def scramble(id: String): IO[List[Match]]
 }
 
 class SessionsServiceImpl(
-  sessionRepository: SessionsRepository
+  sessionRepository: SessionsRepository,
+  participantsService: ParticipantsService,
+  matchesService: MatchesService
 ) extends SessionsService {
 
   override def create(input: CreateSessionInput): IO[Session] = {
@@ -53,5 +62,19 @@ class SessionsServiceImpl(
       ))
       case Left(_) => IO(Left(SessionNotFoundError))
     })
+  }
+
+
+  override def scramble(id: String): IO[List[Match]] = {
+    for {
+      participants <- participantsService.getParticipants(id)
+      randomizedList = Random.shuffle(participants)
+      matchInputs = randomizedList.zip(List(randomizedList.head) ++ randomizedList.drop(1)).map(tuple => {
+        CreateMatchInput(id, tuple._1.id, tuple._2.id)
+      })
+      matches <- matchInputs.map(matchInput => matchesService.create(matchInput)).sequence
+    } yield {
+      matches
+    }
   }
 }
