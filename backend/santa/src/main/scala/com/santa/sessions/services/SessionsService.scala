@@ -9,6 +9,7 @@ import com.santa.sessions.repositories.SessionsRepository
 import cats.implicits._
 
 import java.util.UUID
+import scala.collection.immutable.List
 import scala.util.Random
 
 trait SessionsService {
@@ -68,8 +69,8 @@ class SessionsServiceImpl(
   override def scramble(id: String): IO[List[Match]] = {
     for {
       participants <- participantsService.getParticipants(id)
-      randomizedList = Random.shuffle(participants)
-      matchInputs = randomizedList.zip(List(randomizedList.head) ++ randomizedList.drop(1)).map(tuple => {
+      randomizedList = Random.shuffle(participants).filter(_.participates.getOrElse(false))
+      matchInputs = randomizedList.zip(randomizedList.drop(1) ++ List(randomizedList.head)).map(tuple => {
         CreateMatchInput(id, tuple._1.id, tuple._2.id)
       })
       matches <- matchInputs.map(matchInput => matchesService.create(matchInput)).sequence
