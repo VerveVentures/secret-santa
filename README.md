@@ -25,7 +25,7 @@ body: - all fields are optional
 
 
 ### Participants
-- GET: /api/participants/<session_id> - get all participants in a session
+- GET: /api/participants/session/<session_id> - get all participants in a session
 - GET: /api/participants/<participant_id> - get participant
 - POST: /api/participants - create participant  
 body: - participates and comment fields are optional
@@ -50,6 +50,6 @@ body: - all fields are optional
 ```
 
 ### Matches
-- GET: /api/matches/<session_id> - get all matches in a session
+- GET: /api/matches/session/<session_id> - get all matches in a session
 - GET: /api/matches/<match_id> - get match  
 

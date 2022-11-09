@@ -16,7 +16,7 @@ class ParticipantsController(participantsService: ParticipantsService) {
     import dsl._
 
     HttpRoutes.of[IO] {
-      case GET -> Root / "participants" / UUIDVar(sessionId) => {
+      case GET -> Root / "participants" / "session" /UUIDVar(sessionId) => {
         for {
           result <- participantsService.getParticipants(sessionId.toString)
           result <- Ok(result.asJson)
@@ -24,7 +24,7 @@ class ParticipantsController(participantsService: ParticipantsService) {
           result
         }
       }
-      case GET -> Root / "participant" / UUIDVar(participantId) => {
+      case GET -> Root / "participants" / UUIDVar(participantId) => {
         for {
           result <- participantsService.getParticipant(participantId.toString)
           result <- Ok(result.asJson)

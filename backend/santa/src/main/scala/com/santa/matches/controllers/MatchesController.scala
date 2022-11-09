@@ -16,7 +16,7 @@ class MatchesController(matchesService: MatchesService) {
     import dsl._
 
     HttpRoutes.of[IO] {
-      case GET -> Root / "matches" / UUIDVar(sessionId)=> {
+      case GET -> Root / "matches" / "session" / UUIDVar(sessionId)=> {
         for {
           result <- matchesService.getMatches(sessionId.toString)
           result <- Ok(result.asJson)
@@ -24,7 +24,7 @@ class MatchesController(matchesService: MatchesService) {
           result
         }
       }
-      case GET -> Root / "match" / UUIDVar(matchId) => {
+      case GET -> Root / "matches" / UUIDVar(matchId) => {
         for {
           result <- matchesService.get(matchId.toString)
           result <- Ok(result.asJson)
