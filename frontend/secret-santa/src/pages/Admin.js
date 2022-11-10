@@ -1,6 +1,9 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
+import { useEffect } from 'react';
+import { useNavigate, useParams } from "react-router-dom";
+
 import { Chip, TextField, Grid, Container, styled, Stepper, Step, StepLabel, Box, Button, StepConnector, stepConnectorClasses, Typography } from '@mui/material';
 import Check from '@mui/icons-material/Check';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -9,6 +12,13 @@ import TornadoIcon from '@mui/icons-material/Tornado';
 import EmailIcon from '@mui/icons-material/Email';
 import GroupIcon from '@mui/icons-material/Group';
 
+//services
+import { alertsService } from '../services/alerts.service';
+import { coreService } from '../services/core.service';
+
+//instantiate services
+const alert = new alertsService();
+const core = new coreService();
 
 const steps = [
     'Name Session',
@@ -19,10 +29,35 @@ const steps = [
 
 function Admin() {
 
+    const params = new useParams();
     const [loading, setLoading] = useState(false);
     const [sessionName, setSessionName] = useState('');
     const [participants, setParticipants] = useState('');
     const [activeStep, setActiveStep] = React.useState(0);
+
+
+    //on init that triggers before page load
+    useEffect(() => {
+        checkSessionStage()
+    }, []);
+
+    //EDDY TO ADD API CALLS
+    async function checkSessionStage() {
+        //send this ID to check for session stage
+        console.log(params.id)
+        
+        //this variable should be coming from the back end
+        var sessionStage = 'pending';
+        
+        //if the session is not created yet then start from step 0
+        if(sessionStage == 'pending'){
+            setActiveStep(0)
+        } else if (sessionStage == 'created'){
+            //if session was already created then start from scramble
+            setActiveStep(3)
+        }
+    }
+
 
     function handleSessionNameChange(e) {
         setSessionName(e.target.value)
@@ -116,23 +151,35 @@ function Admin() {
         completed: PropTypes.bool,
     };
 
-    async function createSession(event) {
+
+
+
+    function createSession(event) {
         event.preventDefault();
-        //const data = new FormData(event.currentTarget);
-        console.log(sessionName);
+        const data = new FormData(event.currentTarget);
+        setSessionName(data.get('sessionName'));
+        //console.log(sessionName);
         handleNext();
     };
 
-    async function addParticipants(event) {
+    function addParticipants(event) {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         setParticipants(data.get('participants').split(","));
-        console.log(participants);
+        //console.log(participants);
         handleNext();
     };
 
+    
+    //EDDY TO ADD API CALLS
     async function sendInvitations(event) {
-        console.log(participants);
+        var payload = {
+            sessionName: sessionName,
+            participants: participants
+        }
+
+        console.log(payload);
+        //send payload to BE to send emails and set the stage as CREATED
         handleNext();
     };
 

@@ -9,7 +9,7 @@ import Reject from './pages/Reject';
 export default function Router() {
   return useRoutes([
     { path: '/', element: <Landing /> },
-    { path: '/admin', element: <Admin /> },
+    { path: '/admin/:id', element: <Admin /> },
     { path: '/signup/:id', element: <Signup /> },
     { path: '/reject', element: <Reject /> }
   ]);

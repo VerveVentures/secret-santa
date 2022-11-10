@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 function Landing() {
     return (
         <Stack direction="row" spacing={2}>
-            <Link to="/admin" style={{ textDecoration: 'none' }}>
+            <Link to="/admin/placeholder_id" style={{ textDecoration: 'none' }}>
                 <Button variant="contained" endIcon={<AdminPanelSettingsIcon />}>
                     Admin
                 </Button>
