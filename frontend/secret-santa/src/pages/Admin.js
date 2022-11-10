@@ -22,6 +22,7 @@ function Admin() {
     const [loading, setLoading] = useState(false);
     const [sessionName, setSessionName] = useState('');
     const [participants, setParticipants] = useState('');
+    const [activeStep, setActiveStep] = React.useState(0);
 
     function handleSessionNameChange(e) {
         setSessionName(e.target.value)
@@ -30,6 +31,18 @@ function Admin() {
     function handleParticipantsChange(e) {
         setParticipants(e.target.value)
     }
+
+    const handleNext = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    };
+
+    const handleBack = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    };
+
+    const handleReset = () => {
+        setActiveStep(0);
+    };
 
     const QontoConnector = styled(StepConnector)(({ theme }) => ({
         [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -101,21 +114,6 @@ function Admin() {
          * @default false
          */
         completed: PropTypes.bool,
-    };
-
-
-    const [activeStep, setActiveStep] = React.useState(0);
-
-    const handleNext = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    };
-
-    const handleBack = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep - 1);
-    };
-
-    const handleReset = () => {
-        setActiveStep(0);
     };
 
     async function createSession(event) {
@@ -228,7 +226,7 @@ function Admin() {
                             </Box>
                         ) : activeStep === 2 ? (
                             <>
-                                {participants.map(d => (<Chip label={d} sx={{ ml: 1, mt: 1 }} />))}
+                                {participants.map(p => (<Chip label={p} key={p} sx={{ ml: 1, mt: 1 }} />))}
                                 <LoadingButton
                                     fullWidth
                                     variant="contained"
