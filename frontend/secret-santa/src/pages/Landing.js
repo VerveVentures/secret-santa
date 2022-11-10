@@ -13,7 +13,7 @@ function Landing() {
                     Admin
                 </Button>
             </Link>
-            <Link to="/signup" style={{ textDecoration: 'none' }}>
+            <Link to="/signup/placeholder_id" style={{ textDecoration: 'none' }}>
                 <Button variant="contained" endIcon={<AddIcon />}>
                     Signup
                 </Button>

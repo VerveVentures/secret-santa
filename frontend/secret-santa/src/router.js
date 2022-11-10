@@ -10,7 +10,7 @@ export default function Router() {
   return useRoutes([
     { path: '/', element: <Landing /> },
     { path: '/admin', element: <Admin /> },
-    { path: '/signup', element: <Signup /> },
+    { path: '/signup/:id', element: <Signup /> },
     { path: '/reject', element: <Reject /> }
   ]);
 }
