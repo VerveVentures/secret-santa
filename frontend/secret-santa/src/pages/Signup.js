@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from "react-router-dom";
 
 //mui
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -11,16 +10,33 @@ import { Avatar, TextField, Grid, Box, Container, Stack, Typography, Button } fr
 
 //services
 import { alertsService } from '../services/alerts.service';
+import { coreService } from '../services/core.service';
 
 //instantiate services
 const alert = new alertsService();
+const core = new coreService();
+
 const theme = new createTheme();
 
 function Signup() {
+
+    const params = new useParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+
+    //on init that triggers before page load
+    useEffect(() => {
+        verifySession()
+    }, []);
+
+     //EDDY TO ADD API CALLS
+    async function verifySession() {
+        //send this ID for verification
+        console.log(params.id)
+        //IF TRUE THEN SHOW PAGE ELSE DO NOT
+    }
 
 
     function handleFirstNameChange(e) {
@@ -43,20 +59,20 @@ function Signup() {
         var decision = {
             firstName: data.get('firstName'),
             lastName: data.get('lastName'),
-            comment: data.get('comment')
+            comment: data.get('comment'),
+            participating: event.nativeEvent.submitter.name
         }
 
-        console.log(decision);
-        /*
-        try {
-            await web3Service.deploy(profileData);
-            navigate('/');
-        } catch (error) {
-            console.log(error);
-        } finally {
-            setLoading(false);
+        //EDDY TO ADD API CALLS
+        if (decision.participating == 'Yes') {
+            //api call
+            core.test();
+        } else {
+            navigate("/reject");
+            displayRejectMsg();
         }
-        */
+
+        setLoading(false);
     };
 
     return (
@@ -110,16 +126,17 @@ function Signup() {
                             Do you want to participate?
                         </Typography>
                         <Stack spacing={2} direction="row" sx={{ mt: 1, mb: 5 }}>
-                            <Link to="/reject" style={{ textDecoration: 'none' }} onClick={displayRejectMsg}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    startIcon={<ThumbDownIcon />}
-                                    color="error"
-                                >
-                                    NO
-                                </Button>
-                            </Link>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                startIcon={<ThumbDownIcon />}
+                                color="error"
+                                id="No"
+                                name="No"
+                            >
+                                NO
+                            </Button>
                             <LoadingButton
                                 type="submit"
                                 fullWidth
@@ -129,6 +146,8 @@ function Signup() {
                                 startIcon={<ThumbUpIcon />}
                                 color="success"
                                 disabled={!firstName || !lastName}
+                                id="Yes"
+                                name="Yes"
                             >
                                 YES
                             </LoadingButton>
