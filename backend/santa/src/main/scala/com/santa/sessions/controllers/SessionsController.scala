@@ -32,6 +32,14 @@ class SessionsController(sessionsService: SessionsService) {
           result
         }
       }
+      case POST -> Root / "sessions" / UUIDVar(sessionId) / "launch" => {
+        for {
+          result <- sessionsService.launch(sessionId.toString)
+          result <- Ok(result.asJson)
+        } yield {
+          result
+        }
+      }
       case req@POST -> Root / "sessions" =>
         implicit val participantDecoder: EntityDecoder[IO, CreateSessionInput] = jsonOf[IO, CreateSessionInput]
         for {

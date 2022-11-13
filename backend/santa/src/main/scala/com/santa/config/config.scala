@@ -12,7 +12,9 @@ package object config {
 
   case class DatabaseConfig(driver: String, url: String, user: String, password: String, threadPoolSize: Int)
 
-  case class Config(server: ServerConfig, database: DatabaseConfig)
+  case class MailConfig(apiToken: String, invitationTemplate: String, outcomeTemplate: String)
+
+  case class Config(server: ServerConfig, database: DatabaseConfig, mail: MailConfig)
 
   object Config {
     def load(configFile: String = "application.conf"): Resource[IO, Config] = {

@@ -25,6 +25,7 @@ libraryDependencies ++= Seq(
   "com.github.pureconfig" %% "pureconfig-cats-effect" % PureConfigVersion,
   "com.typesafe" % "config" % "1.2.0",
   "ch.qos.logback"        %  "logback-classic"      % LogbackVersion,
+  "com.mailersend" % "java-sdk" % "0.0.1"
 )
 
 enablePlugins(JavaAppPackaging)

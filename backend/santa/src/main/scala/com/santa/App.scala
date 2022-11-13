@@ -7,6 +7,7 @@ import com.santa.matches.controllers.MatchesController
 import com.santa.participants.controllers.ParticipantsController
 import com.santa.sessions.controllers.SessionsController
 import com.santa.config.config.Config
+import com.santa.emails.EmailsService
 import com.santa.matches.repositories.PostgresMatchesRepository
 import com.santa.matches.services.MatchesServiceImpl
 import com.santa.participants.repositories.PostgresParticipantsRepository
@@ -19,6 +20,7 @@ import org.http4s._
 import org.http4s.implicits._
 import org.http4s.server._
 import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.server.middleware.CORS
 
 object App extends IOApp {
 
@@ -53,11 +55,16 @@ object App extends IOApp {
       participantsService = new ParticipantsServiceImpl(participantsRepository)
       participantsController = new ParticipantsController(participantsService)
       sessionsRepository = new PostgresSessionsRepository(resources.transactor)
-      sessionsService = new SessionsServiceImpl(sessionsRepository,participantsService, matchesService)
+      sessionsService = new SessionsServiceImpl(
+        sessionsRepository,
+        participantsService,
+        matchesService,
+        new EmailsService(resources.config.mail)
+      )
       sessionsController = new SessionsController(sessionsService)
-      apis = Router(
+      apis = CORS(Router(
         "/api" -> allRoutes(sessionsController, participantsController, matchesController),
-      ).orNotFound
+      ).orNotFound)
       exitCode <- BlazeServerBuilder[IO](runtime.compute)
         .bindHttp(resources.config.server.port, resources.config.server.host)
         .withHttpApp(apis)
