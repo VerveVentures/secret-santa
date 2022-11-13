@@ -1,39 +1,40 @@
 package com.santa.emails
 
-import com.santa.participants.models.Participant
-import com.mailersend.sdk.{MailerSend, MailerSendResponse, Recipient}
-import com.mailersend.sdk.emails.Email
-import com.mailersend.sdk.exceptions.MailerSendException
+import cats.effect.IO
 import com.santa.config.config.MailConfig
-import com.santa.sessions.models.Session
+import io.circe.Json
+import io.circe.generic.auto._
+import io.circe.syntax.EncoderOps
+import org.http4s._
+import org.http4s.circe.{jsonEncoderOf, jsonOf}
+import org.http4s.client.Client
+import org.http4s.dsl.Http4sDsl
+import org.http4s.headers.{Accept, Authorization}
+import org.http4s.implicits.http4sLiteralsSyntax
 
+class EmailsService(
+   mailConfig: MailConfig,
+   httpClient: Client[IO]
+) {
 
-class EmailsService(mailConfig: MailConfig) {
+  def sendRequest(emailRequest: EmailRequest): IO[EmailSendResponse] = {
+    val dsl = new Http4sDsl[IO] {}
+    import dsl._
+    implicit val emailRequestEncoder: EntityEncoder[IO, Json] = jsonEncoderOf[IO, Json]
+    implicit val emailSendResponseDecoder: EntityDecoder[IO, EmailSendResponse] = jsonOf[IO, EmailSendResponse]
 
-  def sendInvitationEmail(session: Session, participant: Participant): Boolean = {
-    val email = new Email
-    email.setFrom("Shush Santa", "santa@shush-santa.ch")
-    val recipient = new Recipient(participant.name, participant.email)
-    email.recipients.add(recipient)
+    val request = Request[IO](method = POST, uri = uri"https://api.mailersend.com/v1/email", headers = Headers(
+      Authorization(Credentials.Token(AuthScheme.Bearer, mailConfig.apiToken)),
+      Accept(MediaType.application.json),
+      "X-Requested-With" -> "XMLHttpRequest"
+    )).withEntity(emailRequest.asJson)
 
-    email.setTemplateId(mailConfig.invitationTemplate)
-
-    email.addPersonalization(recipient, "name", participant.name)
-
-    email.addPersonalization(recipient, "session_name", session.name)
-    email.addPersonalization(recipient, "participantId", participant.id)
-
-    val ms = new MailerSend
-
-    ms.setToken(mailConfig.apiToken)
-    try {
-      val response = ms.emails().send(email)
-      println(response.messageId)
-      true
-    } catch {
-      case e: Exception =>
-        e.printStackTrace
-        false
+    for {
+      response <- httpClient.run(request).use(response => {
+        IO { EmailSendResponse(Some(response.status.code)) }
+      })
+    } yield {
+      response
     }
   }
 }

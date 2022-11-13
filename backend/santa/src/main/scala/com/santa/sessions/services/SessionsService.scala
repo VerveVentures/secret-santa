@@ -7,7 +7,8 @@ import com.santa.participants.services.ParticipantsService
 import com.santa.sessions.models.{CreateSessionInput, Session, SessionNotFoundError, UpdateSessionInput}
 import com.santa.sessions.repositories.SessionsRepository
 import cats.implicits._
-import com.santa.emails.EmailsService
+import com.santa.config.config.MailConfig
+import com.santa.emails.{EmailRequest, EmailSendResponse, EmailsService, Recipient, RecipientPersonalization}
 
 import java.util.UUID
 import scala.collection.immutable.List
@@ -27,12 +28,13 @@ trait SessionsService {
 
   def scramble(id: String): IO[List[Match]]
 
-  def launch(id: String): IO[Boolean]
+  def launch(id: String): IO[EmailSendResponse]
 
-  def sendOutcomes(id: String): IO[Boolean]
+  def sendOutcomes(id: String): IO[EmailSendResponse]
 }
 
 class SessionsServiceImpl(
+  mailConfig: MailConfig,
   sessionRepository: SessionsRepository,
   participantsService: ParticipantsService,
   matchesService: MatchesService,
@@ -80,24 +82,56 @@ class SessionsServiceImpl(
         CreateMatchInput(id, tuple._1.id, tuple._2.id)
       })
       matches <- matchInputs.map(matchInput => matchesService.create(matchInput)).sequence
+      _ <- updateSession(id, UpdateSessionInput(None, sessionScrambled = Some(true), None))
     } yield {
       matches
     }
   }
 
-  override def launch(id: String): IO[Boolean] = {
+  override def launch(id: String): IO[EmailSendResponse] = {
     for {
       session <- get(id).map(_.getOrElse(throw new Exception(s"Could not find session with id ${id}")))
-      participants <- participantsService.getParticipants(id)
-      _ <- IO {
-        participants.map(participant => {
-          emailsService.sendInvitationEmail(session, participant)
-        })
-      }
+      participants <- participantsService.getParticipants(id).map(_.filter(_.participates.getOrElse(false)))
+      emailResponse <- participants.map(participant => {
+        emailsService.sendRequest(EmailRequest(
+          from = Recipient("Shush Santa", "santa@shush-santa.ch"),
+          to = List(Recipient(participant.name, participant.email)),
+          personalization = List(RecipientPersonalization(
+            email = participant.email,
+            data = Map("name" -> participant.name,
+              "session_name" -> session.name,
+              "participantId" -> participant.id,
+            ))),
+          template_id = mailConfig.invitationTemplate
+        ))
+      }).sequence
+      _ <- updateSession(id, UpdateSessionInput(None, None, emailsSent = Some(true)))
     } yield {
-      true
+      emailResponse.head
     }
   }
 
-  override def sendOutcomes(id: String): IO[Boolean] = ???
+  override def sendOutcomes(id: String): IO[EmailSendResponse] = {
+    for {
+      participants <- participantsService.getParticipants(id)
+      matches <- matchesService.getMatches(id)
+      emailResponse <- participants.map(participant => {
+        val matching = matches.find(_.giver == participant.id).getOrElse(throw new Exception(s"No matching found for participant ${participant.id}"))
+        val targetParticipant = participants.find(_.id == matching.receiver).getOrElse(throw new Exception(s"Could not find receiver in match ${matching.id}"))
+        emailsService.sendRequest(EmailRequest(
+          from = Recipient("Shush Santa", "santa@shush-santa.ch"),
+          to = List(Recipient(participant.name, participant.email)),
+          personalization = List(RecipientPersonalization(
+            email = participant.email,
+            data = Map("name" -> participant.name,
+              "target_name" -> targetParticipant.name,
+              "target_comment" -> targetParticipant.comment.getOrElse("No preference!"),
+            ))),
+          template_id = mailConfig.outcomeTemplate
+        ))
+      }).sequence
+    } yield {
+      emailResponse.head
+    }
+  }
 }

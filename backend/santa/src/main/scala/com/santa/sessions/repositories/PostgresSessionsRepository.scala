@@ -41,7 +41,7 @@ class PostgresSessionsRepository(transactor: Transactor[IO]) extends SessionsRep
 
 
   override def updateSession(id: String, session: Session): IO[Either[SessionNotFoundError.type, Session]] = {
-    sql"UPDATE session SET name = ${session.name}, passphrase = ${session.passphrase}, session_scrambled = ${session.sessionScrambled}, emails_sent = ${session.emailsSent} WHERE id = $id".update.run.transact(transactor).map { affectedRows =>
+    sql"UPDATE sessions SET name = ${session.name}, passphrase = ${session.passphrase}, session_scrambled = ${session.sessionScrambled}, emails_sent = ${session.emailsSent} WHERE id = $id".update.run.transact(transactor).map { affectedRows =>
       if (affectedRows == 1) {
         Right(session)
       } else {

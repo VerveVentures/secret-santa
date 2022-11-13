@@ -17,10 +17,14 @@ import com.santa.sessions.services.SessionsServiceImpl
 import doobie.hikari.HikariTransactor
 import doobie.util.ExecutionContexts
 import org.http4s._
+import org.http4s.client.Client
+import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.implicits._
 import org.http4s.server._
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.middleware.CORS
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object App extends IOApp {
 
@@ -41,7 +45,8 @@ object App extends IOApp {
       config <- Config.load(configFile)
       ec <- ExecutionContexts.fixedThreadPool[IO](config.database.threadPoolSize)
       transactor <- Database.transactor(config.database, ec)
-    } yield Resources(transactor, config)
+      httpClient <- BlazeClientBuilder[IO](global).resource
+    } yield Resources(transactor, config, httpClient)
   }
 
   private def create(resources: Resources): IO[ExitCode] = {
@@ -56,10 +61,11 @@ object App extends IOApp {
       participantsController = new ParticipantsController(participantsService)
       sessionsRepository = new PostgresSessionsRepository(resources.transactor)
       sessionsService = new SessionsServiceImpl(
+        resources.config.mail,
         sessionsRepository,
         participantsService,
         matchesService,
-        new EmailsService(resources.config.mail)
+        new EmailsService(resources.config.mail, resources.httpClient)
       )
       sessionsController = new SessionsController(sessionsService)
       apis = CORS(Router(
@@ -74,5 +80,5 @@ object App extends IOApp {
     } yield exitCode
   }
 
-  case class Resources(transactor: HikariTransactor[IO], config: Config)
+  case class Resources(transactor: HikariTransactor[IO], config: Config, httpClient: Client[IO])
 }

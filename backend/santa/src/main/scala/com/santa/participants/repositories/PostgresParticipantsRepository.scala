@@ -17,7 +17,7 @@ class PostgresParticipantsRepository(transactor: Transactor[IO]) extends Partici
   }
 
   override def getParticipants(sessionId: String): IO[List[Participant]] = {
-    sql"SELECT id, session_id, name, email, participates, comment FROM participants".query[Participant].stream.compile.toList.transact(transactor)
+    sql"SELECT id, session_id, name, email, participates, comment FROM participants WHERE session_id = $sessionId".query[Participant].stream.compile.toList.transact(transactor)
   }
 
   override def getParticipant(id: String): IO[Either[ParticipantNotFoundError.type, Participant]] = {

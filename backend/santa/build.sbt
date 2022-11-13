@@ -15,17 +15,17 @@ lazy val LogbackVersion = "1.2.11"
 
 libraryDependencies ++= Seq(
   "org.http4s"      %% "http4s-blaze-server" % Http4sVersion,
+  "org.http4s"      %% "http4s-blaze-client" % Http4sVersion,
   "org.http4s"      %% "http4s-circe"        % Http4sVersion,
   "org.http4s"      %% "http4s-dsl"          % Http4sVersion,
   "io.circe"        %% "circe-generic"       % CirceVersion,
-  "org.tpolecat" %% "doobie-core" % DoobieVersion,
-  "org.tpolecat" %% "doobie-postgres" % DoobieVersion,
-  "org.tpolecat" %% "doobie-hikari" % DoobieVersion,
+  "org.tpolecat"    %% "doobie-core" % DoobieVersion,
+  "org.tpolecat"    %% "doobie-postgres" % DoobieVersion,
+  "org.tpolecat"    %% "doobie-hikari" % DoobieVersion,
   "com.github.pureconfig" %% "pureconfig" % PureConfigVersion,
   "com.github.pureconfig" %% "pureconfig-cats-effect" % PureConfigVersion,
   "com.typesafe" % "config" % "1.2.0",
-  "ch.qos.logback"        %  "logback-classic"      % LogbackVersion,
-  "com.mailersend" % "java-sdk" % "0.0.1"
+  "ch.qos.logback"        %  "logback-classic"      % LogbackVersion
 )
 
 enablePlugins(JavaAppPackaging)
