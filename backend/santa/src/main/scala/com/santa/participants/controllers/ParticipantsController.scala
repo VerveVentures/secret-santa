@@ -28,7 +28,7 @@ class ParticipantsController(participantsService: ParticipantsService) {
         for {
           result <- participantsService.getParticipant(participantId.toString)
           result <- result match {
-            case Left(_) => Ok(s"Participant with id ${participantId} could not found!")
+            case Left(_) => NotFound(s"Participant with id ${participantId} could not be found!")
             case Right(value) => Ok(value.asJson)
           }
         } yield {

@@ -20,7 +20,7 @@ class SessionsController(sessionsService: SessionsService) {
         for {
           result <- sessionsService.get(sessionId.toString)
           result <- result match {
-            case Left(_) => Ok(s"Session with id ${sessionId} could not found!")
+            case Left(_) => NotFound(s"Session with id ${sessionId} could not be found!")
             case Right(value) => Ok(value.asJson)
           }
         } yield {

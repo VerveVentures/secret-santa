@@ -28,7 +28,7 @@ class MatchesController(matchesService: MatchesService) {
         for {
           result <- matchesService.get(matchId.toString)
           result <- result match {
-            case Left(_) => Ok(s"Matching with id ${matchId} could not found!")
+            case Left(_) => NotFound(s"Matching with id ${matchId} could not be found!")
             case Right(value) => Ok(value.asJson)
           }
         } yield {
