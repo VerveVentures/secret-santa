@@ -27,7 +27,10 @@ class MatchesController(matchesService: MatchesService) {
       case GET -> Root / "matches" / UUIDVar(matchId) => {
         for {
           result <- matchesService.get(matchId.toString)
-          result <- Ok(result.asJson)
+          result <- result match {
+            case Left(_) => Ok(s"Matching with id ${matchId} could not found!")
+            case Right(value) => Ok(value.asJson)
+          }
         } yield {
           result
         }

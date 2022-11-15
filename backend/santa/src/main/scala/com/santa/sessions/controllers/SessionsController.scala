@@ -19,7 +19,10 @@ class SessionsController(sessionsService: SessionsService) {
       case GET -> Root / "sessions" / UUIDVar(sessionId) => {
         for {
           result <- sessionsService.get(sessionId.toString)
-          result <- Ok(result.asJson)
+          result <- result match {
+            case Left(_) => Ok(s"Session with id ${sessionId} could not found!")
+            case Right(value) => Ok(value.asJson)
+          }
         } yield {
           result
         }

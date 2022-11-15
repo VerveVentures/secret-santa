@@ -27,7 +27,10 @@ class ParticipantsController(participantsService: ParticipantsService) {
       case GET -> Root / "participants" / UUIDVar(participantId) => {
         for {
           result <- participantsService.getParticipant(participantId.toString)
-          result <- Ok(result.asJson)
+          result <- result match {
+            case Left(_) => Ok(s"Participant with id ${participantId} could not found!")
+            case Right(value) => Ok(value.asJson)
+          }
         } yield {
           result
         }
