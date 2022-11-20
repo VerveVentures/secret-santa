@@ -95,10 +95,10 @@ class SessionsServiceImpl(
       emailResponse <- participants.map(participant => {
         emailsService.sendRequest(EmailRequest(
           from = Recipient("Shush Santa", "santa@shush-santa.ch"),
-          to = List(Recipient(participant.name, participant.email)),
+          to = List(Recipient(participant.firstName, participant.email)),
           personalization = List(RecipientPersonalization(
             email = participant.email,
-            data = Map("name" -> participant.name,
+            data = Map("name" -> participant.firstName,
               "session_name" -> session.name,
               "participantId" -> participant.id,
             ))),
@@ -120,11 +120,11 @@ class SessionsServiceImpl(
         val targetParticipant = participants.find(_.id == matching.receiver).getOrElse(throw new Exception(s"Could not find receiver in match ${matching.id}"))
         emailsService.sendRequest(EmailRequest(
           from = Recipient("Shush Santa", "santa@shush-santa.ch"),
-          to = List(Recipient(participant.name, participant.email)),
+          to = List(Recipient(participant.firstName, participant.email)),
           personalization = List(RecipientPersonalization(
             email = participant.email,
-            data = Map("name" -> participant.name,
-              "target_name" -> targetParticipant.name,
+            data = Map("name" -> participant.firstName,
+              "target_name" -> (targetParticipant.firstName + " " + targetParticipant.lastName),
               "target_comment" -> targetParticipant.comment.getOrElse("No preference!"),
             ))),
           template_id = mailConfig.outcomeTemplate

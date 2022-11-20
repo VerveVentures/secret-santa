@@ -32,7 +32,8 @@ body: - participates and comment fields are optional
 ```
   {
     sessionId: String,
-    name: String,
+    firstName: String,
+    lastName: String,
     email: String,
     participates: Boolean,
     comment: String
@@ -42,7 +43,8 @@ body: - participates and comment fields are optional
 body: - all fields are optional
 ```
   {
-    name: String,
+    firstName: String,
+    lastName: String,
     email: String,
     participates: Boolean,
     comment: String

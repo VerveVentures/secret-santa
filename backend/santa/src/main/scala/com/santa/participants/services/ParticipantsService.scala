@@ -27,7 +27,8 @@ class ParticipantsServiceImpl(
   override def create(input: CreateParticipantInput): IO[Participant] = {
     participantRepository.create(Participant(
       id = UUID.randomUUID().toString,
-      name = input.name,
+      firstName = input.firstName,
+      lastName = input.lastName,
       sessionId = input.sessionId,
       comment = input.comment,
       email = input.email,
@@ -50,7 +51,8 @@ class ParticipantsServiceImpl(
   override def updateParticipant(id: String, updateInput: UpdateParticipantInput): IO[Either[ParticipantNotFoundError.type, Participant]] = {
     participantRepository.getParticipant(id).flatMap( {
         case Right(a) => participantRepository.updateParticipant(id, a.copy(
-          name = updateInput.name.getOrElse(a.name),
+          firstName = updateInput.firstName.getOrElse(a.firstName),
+          lastName = updateInput.lastName.getOrElse(a.lastName),
           email = updateInput.email.getOrElse(a.email),
           participates = updateInput.participates.orElse(a.participates),
           comment = updateInput.comment.orElse(a.comment)

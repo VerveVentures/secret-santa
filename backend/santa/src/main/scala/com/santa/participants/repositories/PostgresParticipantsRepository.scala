@@ -10,18 +10,18 @@ class PostgresParticipantsRepository(transactor: Transactor[IO]) extends Partici
 
   private val simpleLogHandler = LogHandler.jdkLogHandler
   override def create(input: Participant): IO[Participant] = {
-    sql"INSERT INTO participants (id, session_id, name, email, participates, comment) VALUES (${input.id}, ${input.sessionId}, ${input.name}, ${input.email}, ${input.participates}, ${input.comment})"
+    sql"INSERT INTO participants (id, session_id, first_name, last_name, email, participates, comment) VALUES (${input.id}, ${input.sessionId}, ${input.firstName}, ${input.lastName}, ${input.email}, ${input.participates}, ${input.comment})"
         .updateWithLogHandler(simpleLogHandler).run.transact(transactor).map(_ => {
       input
     })
   }
 
   override def getParticipants(sessionId: String): IO[List[Participant]] = {
-    sql"SELECT id, session_id, name, email, participates, comment FROM participants WHERE session_id = $sessionId".query[Participant].stream.compile.toList.transact(transactor)
+    sql"SELECT id, session_id, first_name, last_name, email, participates, comment FROM participants WHERE session_id = $sessionId".query[Participant].stream.compile.toList.transact(transactor)
   }
 
   override def getParticipant(id: String): IO[Either[ParticipantNotFoundError.type, Participant]] = {
-    sql"SELECT id, session_id, name, email, participates, comment FROM participants WHERE id = $id".query[Participant].option.transact(transactor).map {
+    sql"SELECT id, session_id, first_name, last_name, email, participates, comment FROM participants WHERE id = $id".query[Participant].option.transact(transactor).map {
       case Some(participant) => Right(participant)
       case None => Left(ParticipantNotFoundError)
     }
@@ -38,7 +38,7 @@ class PostgresParticipantsRepository(transactor: Transactor[IO]) extends Partici
   }
 
   override def updateParticipant(id: String, participant: Participant): IO[Either[ParticipantNotFoundError.type, Participant]] = {
-    sql"UPDATE participants SET name = ${participant.name}, email = ${participant.email}, participates = ${participant.participates}, comment = ${participant.comment} WHERE id = $id".update.run.transact(transactor).map { affectedRows =>
+    sql"UPDATE participants SET first_name = ${participant.firstName},  last_name =${participant.lastName}, email = ${participant.email}, participates = ${participant.participates}, comment = ${participant.comment} WHERE id = $id".update.run.transact(transactor).map { affectedRows =>
       if (affectedRows == 1) {
         Right(participant)
       } else {
