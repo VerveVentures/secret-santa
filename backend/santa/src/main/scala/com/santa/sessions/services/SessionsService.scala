@@ -90,7 +90,7 @@ class SessionsServiceImpl(
   override def launch(id: String): IO[EmailSendResponse] = {
     for {
       session <- get(id).map(_.getOrElse(throw new Exception(s"Could not find session with id ${id}")))
-      participants <- participantsService.getParticipants(id).map(_.filter(_.participates.getOrElse(false)))
+      participants <- participantsService.getParticipants(id)
       emailResponse <- participants.map(participant => {
         emailsService.sendRequest(EmailRequest(
           from = Recipient("Shush Santa", "santa@shush-santa.ch"),
@@ -112,7 +112,7 @@ class SessionsServiceImpl(
 
   override def sendOutcomes(id: String): IO[EmailSendResponse] = {
     for {
-      participants <- participantsService.getParticipants(id)
+      participants <- participantsService.getParticipants(id).map(_.filter(_.participates.getOrElse(false)))
       matches <- matchesService.getMatches(id)
       emailResponse <- participants.map(participant => {
         val matching = matches.find(_.giver == participant.id).getOrElse(throw new Exception(s"No matching found for participant ${participant.id}"))

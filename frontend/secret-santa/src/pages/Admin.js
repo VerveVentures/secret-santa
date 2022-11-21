@@ -41,18 +41,12 @@ function Admin() {
         let session;
         if (params.id) {
             session = await sessionService.getSession(params.id);
-        } else {
-            const storedId = localStorage.getItem(localStorageSessionId);
-            if (storedId) {
-                session = await sessionService.getSession(storedId);
-                navigate(session.id);
-            }
         }
         if (session) {
             if (session.sessionScrambled) {
-                setActiveStep(3);
+                setActiveStep(4);
             } else if (session.emailsSent) {
-                setActiveStep(2);
+                setActiveStep(3);
             } else if(session.name) {
                 setActiveStep(1);
             }
@@ -168,6 +162,11 @@ function Admin() {
         setLoading(true);
         event.preventDefault();
         const data = new FormData(event.currentTarget);
+        if (!data.get('participants')) {
+            handleNext();
+            setLoading(false);
+            return;
+        }
         const participants = data.get('participants').split(/\r\n|\r|\n/);
         setParticipants(participants);
         await participantsService.createParticipants(
