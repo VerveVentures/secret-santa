@@ -5,7 +5,7 @@ export class SessionService {
     apiService = new APIService('sessions');
 
     async createSession(name) {
-        return this.apiService.post('', {name, passphrase: ''});
+        return this.apiService.post(null, {name, passphrase: ''});
     }
 
     async getSession(id) {

@@ -7,7 +7,11 @@ export class APIService {
     }
 
     buildUrl(path) {
-        return this.api + this.root + '/' + path;
+        if (path) {
+            return this.api + this.root + '/' + path;
+        } else {
+            return this.api + this.root;
+        }
     }
 
     handleResponse(response) {

@@ -45,10 +45,10 @@ function Admin() {
             const storedId = localStorage.getItem(localStorageSessionId);
             if (storedId) {
                 session = await sessionService.getSession(storedId);
+                navigate(session.id);
             }
         }
         if (session) {
-            navigate(session.id);
             if (session.sessionScrambled) {
                 setActiveStep(3);
             } else if (session.emailsSent) {
@@ -168,9 +168,20 @@ function Admin() {
         setLoading(true);
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        const participants = data.get('participants').split(",");
+        const participants = data.get('participants').split(/\r\n|\r|\n/);
         setParticipants(participants);
-        await participantsService.createParticipants(params.id, participants);
+        await participantsService.createParticipants(
+            params.id,
+            participants.map(participant => {
+                let parts = participant.split('\t');
+                return ({
+                    sessionId: params.id,
+                    email: parts[0],
+                    firstName: parts[1],
+                    lastName: parts[2]
+                });
+            })
+        );
         handleNext();
         setLoading(false);
     };
@@ -280,7 +291,7 @@ function Admin() {
                                     onClick={sendInvitations}
                                     sx={{ mt: 2 }}
                                 >
-                                    Send Invitation to {participants.length} participants
+                                    Send Invitation to participants
                                 </LoadingButton>
                             </>
                         ) : (
