@@ -30,8 +30,10 @@ function Signup() {
 
     async function verifySession() {
         if (params.id) {
-            if (await participantService.exists(params.id)) {
-                // get and set data
+            const participant = await participantService.get(params.id);
+            if (participant.id === params.id) {
+                setFirstName(participant.firstName);
+                setLastName(participant.lastName);
             } else {
                 navigate("/");
                 alert.showError("Your session is not valid.")
@@ -51,23 +53,24 @@ function Signup() {
     }
 
     async function handleSubmit(event) {
+        
         setLoading(true);
         event.preventDefault();
         const data = new FormData(event.currentTarget);
 
-        var participant = {
-            id: params.id,
+        const participant = {
             firstName: data.get('firstName'),
             lastName: data.get('lastName'),
             comment: data.get('comment'),
-            participates: event.nativeEvent.submitter.id
+            participates: event.nativeEvent.submitter.id === 'yes'
         }
 
-        if (participant.participating === 'yes') {
-            participantService.updateParticipant(participant);
+        if (participant.participates) {
+            participantService.updateParticipant(params.id, participant);
             navigate("/");
             alert.ShowSuccess("Thank you for being a nice santa");
         } else {
+            participantService.updateParticipant(params.id, participant)
             navigate("/reject");
             alert.showError("Santa is dead. Santa remains dead. And you have killed him, it's your fault. You should really reevaluate your life choices and question why you don't want to makes someone else's christmas better you ungrateful little...");
         }
