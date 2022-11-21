@@ -33,10 +33,11 @@ function Signup() {
             if (await participantService.exists(params.id)) {
                 // get and set data
             } else {
-                navigate("/reject");
+                navigate("/");
+                alert.showError("Your session is not valid.")
             }
         } else {
-            navigate("/reject");
+            navigate("/");
         }
     }
 
@@ -47,10 +48,6 @@ function Signup() {
 
     function handleLastNameChange(e) {
         setLastName(e.target.value)
-    }
-
-    function displayRejectMsg() {
-        alert.showError("Santa is dead. Santa remains dead. And you have killed him, it's your fault. You should really reevaluate your life choices and question why you don't want to makes someone else's christmas better you ungrateful little");
     }
 
     async function handleSubmit(event) {
@@ -70,7 +67,7 @@ function Signup() {
             participantService.updateParticipant(participant)
         } else {
             navigate("/reject");
-            displayRejectMsg();
+            alert.showError("Santa is dead. Santa remains dead. And you have killed him, it's your fault. You should really reevaluate your life choices and question why you don't want to makes someone else's christmas better you ungrateful little");
         }
         setLoading(false);
     };
@@ -118,7 +115,7 @@ function Signup() {
                                     rows={4}
                                     id="comment"
                                     name="comment"
-                                    label="Any comment to share with your secret santa?"
+                                    label="Write your wish to your Santa, keep in mind that it is recession"
                                 />
                             </Grid>
                         </Grid>
