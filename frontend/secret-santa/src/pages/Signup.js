@@ -64,10 +64,12 @@ function Signup() {
         }
 
         if (participant.participating === 'yes') {
-            participantService.updateParticipant(participant)
+            participantService.updateParticipant(participant);
+            navigate("/reject");
+            alert.ShowSuccess("Thank you for being a nice santa");
         } else {
             navigate("/reject");
-            alert.showError("Santa is dead. Santa remains dead. And you have killed him, it's your fault. You should really reevaluate your life choices and question why you don't want to makes someone else's christmas better you ungrateful little");
+            alert.showError("Santa is dead. Santa remains dead. And you have killed him, it's your fault. You should really reevaluate your life choices and question why you don't want to makes someone else's christmas better you ungrateful little...");
         }
         setLoading(false);
     };
