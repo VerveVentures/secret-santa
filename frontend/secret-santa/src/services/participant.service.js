@@ -5,7 +5,7 @@ export class ParticipantService {
     apiService = new APIService('participants');
    
     async exists(id) {
-        return this.apiService.get(id).then(response => response.status === 200)
+        return this.apiService.get(id).then(response => response.id === id);
     }
 
     async createParticipants(id, participants) {
