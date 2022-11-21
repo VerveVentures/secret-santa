@@ -1,14 +1,13 @@
-body {
-    width: 100%;
-    height: 100%;
-    background-image: url('../public/snow6.gif');
-    background-size:     100%;
-    background-repeat:   no-repeat;
-}
+.border-gradient {
+    border: 5px solid;
+    border-image-slice: 1;
+    border-color: #D00000;
+    border-image: linear-gradient(var(--angle), #39603B, #d53a9d, #D00000) 1;
+    animation: 2s rotate linear infinite;
+  }
 
-#signup-container{
-    margin-top: 2%;
-    background-color: white;
-    box-shadow: 5px;
-    border-radius: 2%;
-}
+  @keyframes rotate {
+    to {
+      --angle: 360deg;
+    }
+  }
