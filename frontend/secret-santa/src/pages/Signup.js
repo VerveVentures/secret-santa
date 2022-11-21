@@ -65,7 +65,7 @@ function Signup() {
 
         if (participant.participating === 'yes') {
             participantService.updateParticipant(participant);
-            navigate("/reject");
+            navigate("/");
             alert.ShowSuccess("Thank you for being a nice santa");
         } else {
             navigate("/reject");
