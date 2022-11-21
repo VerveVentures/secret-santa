@@ -41,7 +41,6 @@ function Admin() {
         let session;
         if (params.id) {
             session = await sessionService.getSession(params.id);
-            console.log(session)
         } else {
             const storedId = localStorage.getItem(localStorageSessionId);
             if (storedId) {
