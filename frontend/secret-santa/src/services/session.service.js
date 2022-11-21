@@ -12,11 +12,11 @@ export class SessionService {
         return this.apiService.get(id);
     }
 
-    async sendInvitations() {
-
+    async sendInvitations(id) {
+        return this.apiService.post(id + '/launch', {});
     }
 
-    async scramble() {
-
+    async scramble(id) {
+        return this.apiService.post(id + '/scramble', {});
     }
 }

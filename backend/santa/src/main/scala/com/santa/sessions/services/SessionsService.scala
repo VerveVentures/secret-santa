@@ -1,17 +1,16 @@
 package com.santa.sessions.services
 
 import cats.effect.IO
+import cats.implicits._
+import com.santa.config.config.MailConfig
+import com.santa.emails._
 import com.santa.matches.models.{CreateMatchInput, Match}
 import com.santa.matches.services.MatchesService
 import com.santa.participants.services.ParticipantsService
 import com.santa.sessions.models.{CreateSessionInput, Session, SessionNotFoundError, UpdateSessionInput}
 import com.santa.sessions.repositories.SessionsRepository
-import cats.implicits._
-import com.santa.config.config.MailConfig
-import com.santa.emails.{EmailRequest, EmailSendResponse, EmailsService, Recipient, RecipientPersonalization}
 
 import java.util.UUID
-import scala.collection.immutable.List
 import scala.util.Random
 
 trait SessionsService {

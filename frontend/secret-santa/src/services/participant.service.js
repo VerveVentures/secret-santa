@@ -9,10 +9,10 @@ export class ParticipantService {
     }
 
     async createParticipants(id, participants) {
-        participants.map(participant => this.apiService.post(participant))
+        return Promise.all(participants.map(participant => this.apiService.post('', participant)));
     }
 
     async updateParticipant(participant) {
-
+        return this.apiService.put('', participant);
     }
 }

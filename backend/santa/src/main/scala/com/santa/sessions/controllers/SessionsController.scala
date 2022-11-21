@@ -29,8 +29,9 @@ class SessionsController(sessionsService: SessionsService) {
       }
       case POST -> Root / "sessions" / UUIDVar(sessionId) / "scramble" => {
         for {
-          result <- sessionsService.scramble(sessionId.toString)
-          result <- Ok(result.asJson)
+          resultList <- sessionsService.scramble(sessionId.toString)
+          _ <- sessionsService.sendOutcomes(sessionId.toString)
+          result <- Ok(resultList.asJson)
         } yield {
           result
         }
