@@ -10,11 +10,11 @@ import { Avatar, TextField, Grid, Box, Container, Stack, Typography, Button } fr
 
 //services
 import { alertsService } from '../services/alerts.service';
-import { coreService } from '../services/core.service';
+import { ParticipantService } from '../services/participant.service';
 
 //instantiate services
 const alert = new alertsService();
-const core = new coreService();
+const participantService = new ParticipantService();
 
 const theme = new createTheme();
 
@@ -26,16 +26,18 @@ function Signup() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
 
-    //on init that triggers before page load
-    useEffect(() => {
-        verifySession()
-    }, []);
+    useEffect(() => {verifySession()}, []);
 
-     //EDDY TO ADD API CALLS
     async function verifySession() {
-        //send this ID for verification
-        console.log(params.id)
-        //IF TRUE THEN SHOW PAGE ELSE DO NOT
+        if (params.id) {
+            if (await participantService.exists(params.id)) {
+                // get and set data
+            } else {
+                navigate("/reject");
+            }
+        } else {
+            navigate("/reject");
+        }
     }
 
 
@@ -48,7 +50,7 @@ function Signup() {
     }
 
     function displayRejectMsg() {
-        alert.showError("Santa is dead. Santa remains dead. And you have killed him");
+        alert.showError("Santa is dead. Santa remains dead. And you have killed him, it's your fault. You should really reevaluate your life choices and question why you don't want to makes someone else's christmas better you ungrateful little");
     }
 
     async function handleSubmit(event) {
@@ -56,22 +58,20 @@ function Signup() {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
 
-        var decision = {
+        var participant = {
+            id: params.id,
             firstName: data.get('firstName'),
             lastName: data.get('lastName'),
             comment: data.get('comment'),
-            participating: event.nativeEvent.submitter.name
+            participates: event.nativeEvent.submitter.id
         }
 
-        //EDDY TO ADD API CALLS
-        if (decision.participating == 'Yes') {
-            //api call
-            core.test();
+        if (participant.participating === 'yes') {
+            participantService.updateParticipant(participant)
         } else {
             navigate("/reject");
             displayRejectMsg();
         }
-
         setLoading(false);
     };
 
@@ -132,7 +132,7 @@ function Signup() {
                                 variant="contained"
                                 startIcon={<ThumbDownIcon />}
                                 color="error"
-                                id="No"
+                                id="no"
                                 name="No"
                             >
                                 NO
@@ -146,7 +146,7 @@ function Signup() {
                                 startIcon={<ThumbUpIcon />}
                                 color="success"
                                 disabled={!firstName || !lastName}
-                                id="Yes"
+                                id="yes"
                                 name="Yes"
                             >
                                 YES

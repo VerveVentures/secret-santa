@@ -8,12 +8,12 @@ import { Link } from "react-router-dom";
 function Landing() {
     return (
         <Stack direction="row" spacing={2}>
-            <Link to="/admin/placeholder_id" style={{ textDecoration: 'none' }}>
+            <Link to="/admin/" style={{ textDecoration: 'none' }}>
                 <Button variant="contained" endIcon={<AdminPanelSettingsIcon />}>
                     Admin
                 </Button>
             </Link>
-            <Link to="/signup/placeholder_id" style={{ textDecoration: 'none' }}>
+            <Link to="/signup/" style={{ textDecoration: 'none' }}>
                 <Button variant="contained" endIcon={<AddIcon />}>
                     Signup
                 </Button>

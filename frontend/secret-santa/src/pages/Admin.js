@@ -12,13 +12,11 @@ import TornadoIcon from '@mui/icons-material/Tornado';
 import EmailIcon from '@mui/icons-material/Email';
 import GroupIcon from '@mui/icons-material/Group';
 
-//services
-import { alertsService } from '../services/alerts.service';
-import { coreService } from '../services/core.service';
+import { SessionService } from '../services/session.service';
+import { ParticipantService } from '../services/participant.service';
 
-//instantiate services
-const alert = new alertsService();
-const core = new coreService();
+const sessionService = new SessionService();
+const participantsService = new ParticipantService();
 
 const steps = [
     'Name Session',
@@ -28,36 +26,40 @@ const steps = [
 ];
 
 function Admin() {
-
     const params = new useParams();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [sessionName, setSessionName] = useState('');
-    const [participants, setParticipants] = useState('');
+    const [participants, setParticipants] = useState([]);
     const [activeStep, setActiveStep] = React.useState(0);
+    const localStorageSessionId = 'secret-santa-session-id';
 
+    useEffect(() => {checkSessionStage()}, []);
 
-    //on init that triggers before page load
-    useEffect(() => {
-        checkSessionStage()
-    }, []);
-
-    //EDDY TO ADD API CALLS
     async function checkSessionStage() {
-        //send this ID to check for session stage
-        console.log(params.id)
-        
-        //this variable should be coming from the back end
-        var sessionStage = 'pending';
-        
-        //if the session is not created yet then start from step 0
-        if(sessionStage == 'pending'){
-            setActiveStep(0)
-        } else if (sessionStage == 'created'){
-            //if session was already created then start from scramble
-            setActiveStep(3)
+        setLoading(true);
+        let session;
+        if (params.id) {
+            session = await sessionService.getSession(params.id);
+            console.log(session)
+        } else {
+            const storedId = localStorage.getItem(localStorageSessionId);
+            if (storedId) {
+                session = await sessionService.getSession(storedId);
+            }
         }
+        if (session) {
+            navigate(session.id);
+            if (session.sessionScrambled) {
+                setActiveStep(3);
+            } else if (session.emailsSent) {
+                setActiveStep(2);
+            } else if(session.name) {
+                setActiveStep(1);
+            }
+        }
+        setLoading(false);
     }
-
 
     function handleSessionNameChange(e) {
         setSessionName(e.target.value)
@@ -76,6 +78,7 @@ function Admin() {
     };
 
     const handleReset = () => {
+        localStorage.clear();
         setActiveStep(0);
     };
 
@@ -151,40 +154,35 @@ function Admin() {
         completed: PropTypes.bool,
     };
 
-
-
-
-    function createSession(event) {
+    async function createSession(event) {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         setSessionName(data.get('sessionName'));
-        //console.log(sessionName);
+        await sessionService.createSession(sessionName).then(session => {
+            localStorage.setItem(localStorageSessionId, session.id);
+            navigate(session.id)
+        })
         handleNext();
     };
 
-    function addParticipants(event) {
+    async function addParticipants(event) {
+        setLoading(true);
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        setParticipants(data.get('participants').split(","));
-        //console.log(participants);
+        const participants = data.get('participants').split(",");
+        setParticipants(participants);
+        await participantsService.createParticipants(params.id, participants);
         handleNext();
+        setLoading(false);
     };
 
-    
-    //EDDY TO ADD API CALLS
-    async function sendInvitations(event) {
-        var payload = {
-            sessionName: sessionName,
-            participants: participants
-        }
-
-        console.log(payload);
-        //send payload to BE to send emails and set the stage as CREATED
+    function sendInvitations(event) {
+        sessionService.sendInvitations(params.id);
         handleNext();
     };
 
     async function scramble(event) {
-        console.log(participants);
+        sessionService.scramble(params.id);
         handleNext();
     };
 
@@ -301,17 +299,11 @@ function Admin() {
                         )}
                         <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
                             <Button
-                                disabled={activeStep === 0}
+                                disabled={activeStep === 0 || activeStep === 3}
                                 onClick={handleBack}
                             >
                                 Back
                             </Button>
-                            {/* 
-                            <Box sx={{ flex: '1 1 auto' }} />
-                            <Button onClick={handleNext}>
-                                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                            </Button>
-                            */}
                         </Box>
                     </Container>
                 </React.Fragment>
