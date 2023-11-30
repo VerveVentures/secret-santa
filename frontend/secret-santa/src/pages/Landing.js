@@ -23,14 +23,14 @@ function Landing() {
                     <b>How much should I spend in the present?</b>
                 </Typography>
                 <Typography variant="body1" align="left" sx={{ mb: 2, ml: 2, mr: 2 }}>
-                    Of course depends on who you giving the present to. But think around CHF 20.
+                    Of course depends on who you are giving the present to. But the budget should be around CHF 20.
                 </Typography>
 
                 <Typography variant="subtitle1" align="left" sx={{ mt: 2, ml: 2, mr: 2 }}>
                     <b>What should I buy?</b>
                 </Typography>
                 <Typography variant="body1" align="left" sx={{ mb: 2, ml: 2, mr: 2 }}>
-                    That's your problem. Don't over think it, he/she won't like anyway, just buy something but ideally with some meanings for the person.
+                    That's your problem. Don't overthink it, he/she will like it anyway, just get something but ideally with some meaning for the person.
                 </Typography>
 
                 <Typography variant="subtitle1" align="left" sx={{ mt: 2, ml: 2, mr: 2 }}>
@@ -44,7 +44,7 @@ function Landing() {
                     <b>Where I do leave the present?</b>
                 </Typography>
                 <Typography variant="body1" align="left" sx={{ mb: 2, ml: 2, mr: 2 }}>
-                    On a to-be-announced desk on the day of the Christmas dinner in the Verve Office. Idea is to open it before the dinner and avoid the carrying up and down.
+                    Will be anounced at a later time.
                 </Typography>
             </Box>
         </Container>
