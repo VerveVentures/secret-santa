@@ -26,12 +26,15 @@ class EmailsService(
     val request = Request[IO](method = POST, uri = uri"https://api.mailersend.com/v1/email", headers = Headers(
       Authorization(Credentials.Token(AuthScheme.Bearer, mailConfig.apiToken)),
       Accept(MediaType.application.json),
-      "X-Requested-With" -> "XMLHttpRequest"
     )).withEntity(emailRequest.asJson)
 
     for {
-      response <- httpClient.run(request).use(response => {
-        IO { EmailSendResponse(Some(response.status.code)) }
+      response <- httpClient.run(request).attempt.use({
+        case Right(response) => IO(EmailSendResponse(response.status.code))
+        case Left(throwable) => {
+          println("Failed to send email", throwable.getMessage)
+          throw throwable
+        }
       })
     } yield {
       response

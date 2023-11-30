@@ -22,9 +22,11 @@ import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.implicits._
 import org.http4s.server._
 import org.http4s.server.blaze.BlazeServerBuilder
-import org.http4s.server.middleware.CORS
+import org.http4s.server.middleware.CORS.DefaultCORSConfig
+import org.http4s.server.middleware.{CORS, CORSConfig}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.DurationInt
 
 object App extends IOApp {
 
@@ -70,7 +72,10 @@ object App extends IOApp {
       sessionsController = new SessionsController(sessionsService)
       apis = CORS(Router(
         "/api" -> allRoutes(sessionsController, participantsController, matchesController),
-      ).orNotFound)
+      ).orNotFound, DefaultCORSConfig.copy(
+        anyOrigin = false,
+        allowedOrigins = Set("https://shush-santa.ch")
+      ))
       exitCode <- BlazeServerBuilder[IO](runtime.compute)
         .bindHttp(resources.config.server.port, resources.config.server.host)
         .withHttpApp(apis)
